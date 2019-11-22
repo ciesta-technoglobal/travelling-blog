@@ -1,0 +1,109 @@
+package com.ofss.fc.db.procedure.wrapper.impl;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Types;
+
+import com.ofss.fc.db.procedure.AbstractProcedure;
+import com.ofss.fc.infra.exception.FatalException;
+
+public class PkBaCcy  extends AbstractProcedure
+{
+	
+		public static final String PROC_GET_COD_LCY = "GetCodLcy";
+		
+	
+		public static final String PARAM_PI_COD_CC_BRN = "PiCodCcBrn";
+		
+	
+	/**
+	 * Initialize the connection
+	 * @param connection
+	 */
+	public PkBaCcy(Connection connection) {
+		super(connection);
+	}
+
+	/**
+	 * Initialize the connection
+	 */
+	public PkBaCcy() throws FatalException{
+		super();
+	}	
+    
+    protected void registerOutParams(String procName) throws SQLException {
+    		
+    		
+    		if (procName.equalsIgnoreCase(PROC_GET_COD_LCY)) {
+	    		
+				setOutputParam(1,Types.INTEGER);	       	
+       		}
+       	
+    }
+    
+	
+	private String getStmntForGetCodLcy() {
+		 return "DECLARE\n" +		
+		  
+		"BEGIN\n" +
+		
+		   "?:= PK_BA_CCY.GET_COD_LCY(?) ; \n" +
+		
+		"END;";	
+	}
+	
+	/**
+	 * Execute the procedure and populate the return value object with the Procedure output.
+	 */
+	public ReturnVOGetCodLcy execGetCodLcy(
+		int piCodCcBrn
+	)  throws SQLException {
+	
+		String procStmt =  getStmntForGetCodLcy();
+		
+		try {			                 
+            debugProcedureStart(PROC_GET_COD_LCY);
+	        prepareCall(procStmt);
+
+			//set the inputs in the statement
+			
+			setParameter(getParamKey(PROC_GET_COD_LCY,PARAM_PI_COD_CC_BRN),piCodCcBrn,2);
+			debugParameter(PARAM_PI_COD_CC_BRN,piCodCcBrn);
+	        
+	        registerOutParams(PROC_GET_COD_LCY);
+			
+			execute();
+			debugProcedureEnd(PROC_GET_COD_LCY);
+			
+			return new ReturnVOGetCodLcy(this);
+		} catch(SQLException sqlExcp){
+			debugProcedureFailed(PROC_GET_COD_LCY,sqlExcp);
+			throw sqlExcp;
+		} finally {
+			releaseResources(procStmt);
+		}		
+	}
+	
+	
+	public class ReturnVOGetCodLcy {
+		
+		private int 
+			returnValue
+		;
+		
+		public int getReturnValue() {
+			return returnValue;
+		}
+
+		public void setReturnValue(int aReturnValue) {
+			returnValue = aReturnValue;
+		}
+		
+		ReturnVOGetCodLcy
+		(PkBaCcy proc) throws SQLException {
+			setReturnValue(proc.getInt(1));
+							
+		}		
+	}
+	
+}
